@@ -85,16 +85,16 @@ This epic establishes the core three-layer architecture (Parser → Repository �
   - [x] 3.1.7.6 Test duplicate definition detection and rejection
   - [x] 3.1.7.5 Test duplicate predicate deduplication
 
-### 3.2 Layer 2: Repository Implementation
-- [ ] 3.2.1 Create `src/lib/repository/` directory structure
-- [ ] 3.2.2 Implement Node class with id and optional definition
-- [ ] 3.2.3 Implement Edge class with source/target object references
-- [ ] 3.2.4 Build ConceptMap class with graph operations
-- [ ] 3.2.5 Add distance calculation algorithms (BFS-based)
-- [ ] 3.2.6 Implement filtering logic for visible nodes/edges
-- [ ] 3.2.7 Create factory method from parsed declarations
-- [ ] 3.2.8 Add DSL export functionality
-- [ ] 3.2.9 Write unit tests for repository layer
+### 3.2 Layer 2: Repository Implementation ✅
+- [x] 3.2.1 Create `src/lib/repository/` directory structure
+- [x] 3.2.2 Implement Node class with id and optional definition
+- [x] 3.2.3 Implement Edge class with source/target object references
+- [x] 3.2.4 Build ConceptMap class with graph operations
+- [x] 3.2.5 Add distance calculation algorithms (BFS-based)
+- [x] 3.2.6 Implement filtering logic for visible nodes/edges
+- [x] 3.2.7 Create factory method from parsed declarations
+- [x] 3.2.8 Add DSL export functionality
+- [x] 3.2.9 Write unit tests for repository layer
 
 ### 3.3 Layer 3: UI Implementation
 - [ ] 3.3.1 Install react-force-graph-2d dependency
