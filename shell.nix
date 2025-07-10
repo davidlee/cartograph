@@ -6,6 +6,6 @@ pkgs.mkShell {
 
   shellHook = ''
     echo "Entering Next.js development environment..."
-    yarn install # Or npm install
+    npm install
   '';
 }
