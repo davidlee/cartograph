@@ -80,7 +80,7 @@ This project uses a DIY Kanban system with folders and Markdown files.
 - **Git Conventions**: Commits should reference task IDs using format `type(scope): [task-id] description` (conventional commits, plus task ID)
 - **AI Role**: Act as senior developer/pair programmer, update task statuses, and follow the stopping conditions defined in workflow.md
 
- Read and closely follow the instructions in `doc/workflow.md` before beginning work on any task.
+ *Read and closely follow the instructions in `doc/workflow.md` before beginning work on any task.*
 
 ## Code Style & Conventions
 
@@ -92,25 +92,9 @@ This project uses a DIY Kanban system with folders and Markdown files.
 
 ## Planned Functionality
 
-- provide a UI for exploring the currently active concept map as a force-directed, animated graph with spring weights, gravity & repulsive forces
-- interactive controls for navigation
-  - select a visible neighbour (on click), making it the active node
-  - change the filter distance of the active concept map (n, where only neighbours with <= n distant neighbours are shown), e.g. with a slider control
-  - shift-select a visible neighbouring node, highlighting it and adding its neighbours to those displayed.
-  - search (text substring match) for nodes / edges, and
-    - select a node to make it the active node
-    - select an edge to make it active (visualise all predicates with that relationship text)
-    - create a new predicate with the active node and the chosen node or relationship (e.g. by control-clicking)
-  - hover over a node to display its definition
-- general commands 
-  - edit the current concept map as plain text
-  - add a new predicate
-  - export the active concept map as plain text (DSL)
-  - import (replace active, append / merge, or create new) plain text DSL
-  - edit and validate the active concept map as a plain text DSL
-  - export / download the current view as an image (png)
-  - toggle sidebar with definitions for any nodes shown (if defined)
-  - list concept maps (in user's localstorage); select to change the active concept map
+Refer to `doc/specifications/concept_mapping_application.md` for functional requirements and proposed architecture.
+
+Refer to `doc/specifications/implementation_plan.md` for an indicative work breakdown and sequencing.
 
 ## Future Architecture Considerations
 
@@ -121,10 +105,12 @@ This project uses a DIY Kanban system with folders and Markdown files.
 
 ## Testing Strategy
 
-Code should be accompanied by thorough tests.
+All code / significant changes should be accompanied by thorough tests. Where automated testing is not practically possible, a thorough manual verification plan should be provided.
 
 When implementing tests:
 - Use Vitest for unit testing
 - Use Playwright for end-to-end testing
 - Use React Testing Library for component testing
 - Follow the test files structure that matches the source code organization
+- Emphasise extensive unit test coverage; major features should have tests ensuring functioning collaboration between units (integration tests).
+- End to end tests should be added selctively, to provide some assurance the entire system works. They should not attempt to exhaustively cover corner cases.
