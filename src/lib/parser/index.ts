@@ -5,4 +5,4 @@
  */
 
 export { parseDSL } from './parser';
-export { Parser } from './types';
+export type { Parser } from './types';

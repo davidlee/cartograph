@@ -1,0 +1,187 @@
+'use client';
+
+import { useEffect, useRef, useState, useCallback } from 'react';
+import dynamic from 'next/dynamic';
+import { Repository, ConceptMap } from '@/lib/repository';
+import { UI } from './types';
+import { transformToGraphData, selectRandomNode } from './utils';
+
+// Dynamically import ForceGraph2D to avoid SSR issues
+const ForceGraph2D = dynamic(() => import('react-force-graph-2d'), {
+  ssr: false,
+  loading: () => <div className="flex items-center justify-center h-96">Loading graph...</div>
+});
+
+interface ConceptGraphVisualizationProps {
+  conceptMap: ConceptMap;
+  width?: number;
+  height?: number;
+}
+
+/**
+ * Main visualization component for concept maps using react-force-graph-2d
+ */
+export function ConceptGraphVisualization({ 
+  conceptMap, 
+  width = 800, 
+  height = 600 
+}: ConceptGraphVisualizationProps) {
+  const [graphData, setGraphData] = useState<UI.GraphData>({ nodes: [], links: [] });
+  const [selectedNode, setSelectedNode] = useState<Repository.Node | null>(null);
+  const graphRef = useRef<unknown>(null);
+
+  // Update graph data when concept map changes
+  const updateGraphData = useCallback(() => {
+    const newGraphData = transformToGraphData(conceptMap);
+    setGraphData(newGraphData);
+  }, [conceptMap]);
+
+  // Initialize with random node selection on mount
+  useEffect(() => {
+    const randomNode = selectRandomNode(conceptMap);
+    if (randomNode) {
+      conceptMap.setActiveNode(randomNode);
+      setSelectedNode(randomNode);
+    }
+    updateGraphData();
+  }, [conceptMap, updateGraphData]);
+
+  // Handle node click
+  const handleNodeClick = (node: UI.NodeVisual) => {
+    conceptMap.setActiveNode(node.node);
+    setSelectedNode(node.node);
+    updateGraphData();
+  };
+
+  // Handle node hover
+  const handleNodeHover = (_node: UI.NodeVisual | null) => {
+    // Hover state could be managed here for future enhancements
+  };
+
+  // Custom node rendering
+  const nodeCanvasObject = (node: UI.NodeVisual, ctx: CanvasRenderingContext2D, globalScale: number) => {
+    const label = node.name;
+    const fontSize = 12 / globalScale;
+    ctx.font = `${fontSize}px Sans-Serif`;
+    
+    // Measure text
+    const textWidth = ctx.measureText(label).width;
+    const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.2);
+
+    // Draw background circle
+    ctx.fillStyle = node.color || '#1f77b4';
+    ctx.beginPath();
+    ctx.arc(node.x!, node.y!, node.val! + 2, 0, 2 * Math.PI, false);
+    ctx.fill();
+
+    // Draw border for highlighted nodes
+    if (node.highlighted || node.selected) {
+      ctx.strokeStyle = node.highlighted ? '#ff0000' : '#00ff00';
+      ctx.lineWidth = 2 / globalScale;
+      ctx.stroke();
+    }
+
+    // Draw text background
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+    ctx.fillRect(
+      node.x! - bckgDimensions[0] / 2, 
+      node.y! - bckgDimensions[1] / 2, 
+      bckgDimensions[0], 
+      bckgDimensions[1]
+    );
+
+    // Draw text
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#000';
+    ctx.fillText(label, node.x!, node.y!);
+  };
+
+  // Custom link rendering with labels
+  const linkCanvasObjectMode = () => 'after';
+  
+  const linkCanvasObject = (link: UI.EdgeVisual, ctx: CanvasRenderingContext2D, globalScale: number) => {
+    const MAX_FONT_SIZE = 4;
+    
+    const start = { x: link.source, y: link.target };
+    const end = { x: link.source, y: link.target };
+    
+    // Skip if we don't have proper coordinates
+    if (typeof start.x !== 'number' || typeof start.y !== 'number' ||
+        typeof end.x !== 'number' || typeof end.y !== 'number') {
+      return;
+    }
+
+    // Calculate label position (middle of edge)
+    const textPos = {
+      x: start.x + (end.x - start.x) / 2,
+      y: start.y + (end.y - start.y) / 2
+    };
+
+    // Draw label background and text
+    const label = link.label;
+    const fontSize = Math.min(MAX_FONT_SIZE, MAX_FONT_SIZE / globalScale);
+    ctx.font = `${fontSize}px Sans-Serif`;
+    
+    const textWidth = ctx.measureText(label).width;
+    const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.2);
+
+    // Draw background
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+    ctx.fillRect(
+      textPos.x - bckgDimensions[0] / 2, 
+      textPos.y - bckgDimensions[1] / 2, 
+      bckgDimensions[0], 
+      bckgDimensions[1]
+    );
+
+    // Draw text
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = link.color || '#999';
+    ctx.fillText(label, textPos.x, textPos.y);
+  };
+
+  return (
+    <div className="concept-graph-visualization">
+      <div className="mb-4 p-4 bg-gray-100 rounded">
+        <h3 className="text-lg font-semibold mb-2">Concept Map: {conceptMap.name}</h3>
+        <div className="text-sm text-gray-600">
+          <span>Active Node: {selectedNode?.id || 'None'}</span>
+          {selectedNode?.definition && (
+            <div className="mt-2 p-2 bg-white rounded border">
+              <strong>{selectedNode.id}:</strong> {selectedNode.definition}
+            </div>
+          )}
+        </div>
+        <div className="mt-2 text-xs text-gray-500">
+          Nodes: {graphData.nodes.length} | Edges: {graphData.links.length} | 
+          Max Distance: {conceptMap.getMaxDistance()} | 
+          Bidirectional: {conceptMap.isBidirectional() ? 'Yes' : 'No'}
+        </div>
+      </div>
+      
+      <ForceGraph2D
+        ref={graphRef}
+        graphData={graphData}
+        width={width}
+        height={height}
+        nodeCanvasObject={nodeCanvasObject}
+        nodeCanvasObjectMode={() => 'replace'}
+        linkCanvasObject={linkCanvasObject}
+        linkCanvasObjectMode={linkCanvasObjectMode}
+        onNodeClick={handleNodeClick}
+        onNodeHover={handleNodeHover}
+        linkColor={(link: UI.EdgeVisual) => link.color || '#999'}
+        linkWidth={(link: UI.EdgeVisual) => link.width || 1}
+        nodeRelSize={4}
+        linkDirectionalArrowLength={6}
+        linkDirectionalArrowRelPos={1}
+        d3AlphaDecay={0.02}
+        d3VelocityDecay={0.3}
+        cooldownTicks={100}
+        backgroundColor="#ffffff"
+      />
+    </div>
+  );
+}

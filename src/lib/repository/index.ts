@@ -5,4 +5,4 @@
  */
 
 export { ConceptMap } from './concept-map';
-export { Repository } from './types';
+export type { Repository } from './types';

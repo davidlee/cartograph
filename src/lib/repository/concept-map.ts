@@ -23,7 +23,7 @@ export class ConceptMap {
     if (existingNode) {
       // Update definition if provided
       if (definition !== undefined) {
-        (existingNode as any).definition = definition;
+        (existingNode as { definition?: string }).definition = definition;
       }
       return existingNode;
     }
