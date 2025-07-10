@@ -1,20 +1,13 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# cartograph
 
-## Getting Started
+This is a [Next.js](https://nextjs.org) app for authoring and exploring [Concept Maps](https://en.wikipedia.org/wiki/Concept_map), authored using Claude Code. 
 
-Run the development server:
+Take a look at the doc and kanban folders - it's better documented than most projects (by necessity).
 
-```bash
-npm run dev
-# or
-bun dev
-```
+## Current Status
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-## Online Docs
-
-- [Next.js Documentation](https://nextjs.org/docs) - Next.js API docs.
-- [Learn Next.js](https://nextjs.org/learn) - interactive Next.js tutorial.
-- [the Next.js GitHub repository](https://github.com/vercel/next.js)
-
+Working proof of concept.
+- Functional parser, repository
+- Minimal but working UI for exploring existing maps.
+- Somewhat janky transitions.
+- No editor.
