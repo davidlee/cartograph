@@ -52,14 +52,38 @@ This epic establishes the core three-layer architecture (Parser → Repository �
 
 ## 3. Implementation Plan & Progress
 
-### 3.1 Layer 1: Parser Implementation
-- [ ] 3.1.1 Create `src/lib/parser/` directory structure
-- [ ] 3.1.2 Define TypeScript interfaces for Parser namespace
-- [ ] 3.1.3 Implement predicate parsing with regex/string splitting
-- [ ] 3.1.4 Implement definition parsing with multi-line support
-- [ ] 3.1.5 Add syntax validation and error reporting
-- [ ] 3.1.6 Create warning system for orphaned/missing definitions
-- [ ] 3.1.7 Write comprehensive unit tests for parser
+### 3.1 Layer 1: Parser Implementation ✅
+- [x] 3.1.1 Create `src/lib/parser/` directory structure
+- [x] 3.1.2 Define TypeScript interfaces for Parser namespace
+  - [x] 3.1.2.1 ParsedDeclarations interface with predicates/definitions/errors/warnings
+  - [x] 3.1.2.2 ParseError interface with line/column/message/type
+  - [x] 3.1.2.3 ParseWarning interface for orphaned/missing definitions
+  - [x] 3.1.2.4 Predicate interface with source/relationship/target
+- [x] 3.1.3 Implement predicate parsing with regex/string splitting
+  - [x] 3.1.3.1 Parse `concept -- relationship -> concept` syntax
+  - [x] 3.1.3.2 Validate no newlines in concept names or relationships
+  - [x] 3.1.3.3 Validate no '--' or '->' tokens within concept/relationship text
+  - [x] 3.1.3.4 Trim all whitespace around concepts and relationships
+- [x] 3.1.4 Implement definition parsing with multi-line support
+  - [x] 3.1.4.1 Parse `concept:\n<text>\n---` syntax
+  - [x] 3.1.4.2 Support multi-line descriptive text
+  - [x] 3.1.4.3 Handle `---` terminator with optional whitespace
+  - [x] 3.1.4.4 Validate definition format and concept name consistency
+  - [x] 3.1.4.5 Enforce single definition per concept (error on duplicates)
+- [x] 3.1.5 Add syntax validation and error reporting
+  - [x] 3.1.5.1 Report line/column numbers for syntax errors
+  - [x] 3.1.5.2 Provide clear error messages for malformed syntax
+  - [x] 3.1.5.3 Fail fast on first syntax error encountered
+- [x] 3.1.6 Create warning system for orphaned/missing definitions
+  - [x] 3.1.6.1 Warn about definitions without corresponding predicates
+  - [x] 3.1.6.2 Warn about concepts in predicates without definitions (non-fatal)
+- [x] 3.1.7 Write comprehensive unit tests for parser
+  - [x] 3.1.7.1 Test valid predicate and definition parsing
+  - [x] 3.1.7.2 Test syntax error cases with proper error reporting
+  - [x] 3.1.7.3 Test warning generation for orphaned/missing definitions
+  - [x] 3.1.7.4 Test edge cases (empty input, whitespace trimming, ASCII-only)
+  - [x] 3.1.7.6 Test duplicate definition detection and rejection
+  - [x] 3.1.7.5 Test duplicate predicate deduplication
 
 ### 3.2 Layer 2: Repository Implementation
 - [ ] 3.2.1 Create `src/lib/repository/` directory structure
@@ -101,6 +125,12 @@ None identified at planning stage.
 - React-force-graph-2d chosen as specified in technical requirements
 - Three-layer architecture enforced to maintain separation of concerns
 - Focus on core functionality only - advanced features deferred to future tasks
+- **2025-01-10**: Parser implementation decisions confirmed:
+  - Fail fast on first syntax error encountered
+  - Trim all whitespace around concepts and relationships
+  - Enforce single definition per concept (error on duplicates)
+  - ASCII-only for now, plan for Unicode support (add TODO comments)
+  - Target: several hundred predicates, 1-2 paragraph definitions
 
 ## 6. Code Snippets & Artifacts
 
