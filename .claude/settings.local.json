@@ -6,7 +6,10 @@
       "Bash(npm test:*)",
       "Bash(mkdir:*)",
       "Bash(npm run build:*)",
-      "Bash(mv:*)"
+      "Bash(mv:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(npm run dev:*)"
     ],
     "deny": []
   }

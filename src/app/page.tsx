@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { parseDSL } from '@/lib/parser';
 import { ConceptMap } from '@/lib/repository';
-import { SimpleConceptDisplay } from '@/components/SimpleConceptDisplay';
+import { AdvancedConceptVisualization } from '@/components/AdvancedConceptVisualization';
 
 const SAMPLE_DSL = `software -- implements -> functionality
 software -- requires -> planning
@@ -85,10 +85,7 @@ export default function Home() {
       // Create concept map from parsed declarations
       const map = ConceptMap.fromParsedDeclarations('Software Development Concepts', parsed);
       
-      // Set initial filter to show nodes within distance 1 of active node
-      map.setMaxDistance(1);
-      map.setBidirectional(true);
-      
+      // Distance configuration is now handled by the visualization component
       setConceptMap(map);
       
       // Log some info for debugging
@@ -136,13 +133,17 @@ export default function Home() {
         </header>
         
         <main>
-          <SimpleConceptDisplay conceptMap={conceptMap} />
+          <AdvancedConceptVisualization 
+            conceptMap={conceptMap}
+            width={1200}
+            height={800}
+          />
         </main>
         
         <footer className="mt-6 text-sm text-gray-500">
           <p>
-            Demo showing DSL parsing → Repository graph → Interactive visualization flow.
-            Random node selected on load, showing node + direct neighbors.
+            Advanced force-directed visualization with smooth transitions and relationship labels.
+            Random node selected on load, showing filtered neighbors with interactive navigation.
           </p>
         </footer>
       </div>

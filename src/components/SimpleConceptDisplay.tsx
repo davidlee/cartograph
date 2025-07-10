@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Repository, ConceptMap } from '@/lib/repository';
 import { selectRandomNode } from './utils';
 
@@ -16,6 +16,11 @@ export function SimpleConceptDisplay({ conceptMap }: SimpleConceptDisplayProps) 
   const [visibleNodes, setVisibleNodes] = useState<Repository.Node[]>([]);
   const [visibleEdges, setVisibleEdges] = useState<Repository.Edge[]>([]);
 
+  const updateDisplay = useCallback(() => {
+    setVisibleNodes(conceptMap.getVisibleNodes());
+    setVisibleEdges(conceptMap.getVisibleEdges());
+  }, [conceptMap]);
+
   // Initialize with random node selection
   useEffect(() => {
     const randomNode = selectRandomNode(conceptMap);
@@ -24,12 +29,7 @@ export function SimpleConceptDisplay({ conceptMap }: SimpleConceptDisplayProps) 
       setSelectedNode(randomNode);
       updateDisplay();
     }
-  }, [conceptMap]);
-
-  const updateDisplay = () => {
-    setVisibleNodes(conceptMap.getVisibleNodes());
-    setVisibleEdges(conceptMap.getVisibleEdges());
-  };
+  }, [conceptMap, updateDisplay]);
 
   const handleNodeClick = (node: Repository.Node) => {
     conceptMap.setActiveNode(node);

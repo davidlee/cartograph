@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { ConceptMap } from './concept-map';
-import { Repository } from './types';
 import { parseDSL } from '../parser';
 
 describe('ConceptMap', () => {

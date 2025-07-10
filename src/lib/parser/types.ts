@@ -7,6 +7,7 @@
  * 
  * TODO: Add Unicode support for concept names and relationships
  */
+// eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace Parser {
   /**
    * Represents a relationship between two concepts

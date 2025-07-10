@@ -4,6 +4,7 @@
  * Manages logical graph structure and navigation state with
  * object references between nodes and edges.
  */
+// eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace Repository {
   /**
    * Represents a concept node in the graph

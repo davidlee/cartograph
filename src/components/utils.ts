@@ -6,7 +6,7 @@ import { UI } from './types';
  */
 
 /**
- * Convert a ConceptMap to GraphData for visualization
+ * Convert a ConceptMap to GraphData for visualization with articulated relationships
  */
 export function transformToGraphData(conceptMap: ConceptMap): UI.GraphData {
   const visibleNodes = conceptMap.getVisibleNodes();
@@ -14,8 +14,8 @@ export function transformToGraphData(conceptMap: ConceptMap): UI.GraphData {
   const activeNode = conceptMap.getActiveNode();
   const selectedNodes = new Set(conceptMap.getSelectedNodes());
 
-  // Transform nodes
-  const nodeVisuals: UI.NodeVisual[] = visibleNodes.map(node => {
+  // Transform concept nodes
+  const conceptNodeVisuals: UI.NodeVisual[] = visibleNodes.map(node => {
     const distance = conceptMap.getDistanceFromActive(node);
     const isActive = activeNode?.equals(node) ?? false;
     const isSelected = selectedNodes.has(node);
@@ -24,34 +24,83 @@ export function transformToGraphData(conceptMap: ConceptMap): UI.GraphData {
       id: node.id,
       name: node.id,
       node,
+      nodeType: 'concept',
       highlighted: isActive,
       selected: isSelected,
       distance,
-      val: isActive ? 8 : (isSelected ? 6 : 4), // Size based on status
       color: getNodeColor(isActive, isSelected, distance)
     };
   });
 
-  // Transform edges
-  const edgeVisuals: UI.EdgeVisual[] = visibleEdges.map(edge => {
-    const activeRelationship = conceptMap.getActiveRelationship();
-    const isHighlighted = activeRelationship === edge.relationship;
+  // Group edges by relationship to create relationship nodes
+  const relationshipGroups = new Map<string, Repository.Edge[]>();
+  visibleEdges.forEach(edge => {
+    const key = edge.relationship;
+    if (!relationshipGroups.has(key)) {
+      relationshipGroups.set(key, []);
+    }
+    relationshipGroups.get(key)!.push(edge);
+  });
+
+  // Create relationship nodes
+  const relationshipNodeVisuals: UI.NodeVisual[] = Array.from(relationshipGroups.entries()).map(([relationship, edges]) => {
+    // Calculate distance as minimum distance from any connected concept
+    const distances = edges.flatMap(edge => [
+      conceptMap.getDistanceFromActive(edge.source),
+      conceptMap.getDistanceFromActive(edge.target)
+    ]);
+    const minDistance = Math.min(...distances);
     
     return {
-      id: edge.id,
-      source: edge.source.id,
-      target: edge.target.id,
-      label: edge.relationship,
-      edge,
-      highlighted: isHighlighted,
-      color: getEdgeColor(isHighlighted),
-      width: isHighlighted ? 3 : 1
+      id: `rel:${relationship}`,
+      name: relationship,
+      nodeType: 'relationship',
+      highlighted: false,
+      selected: false,
+      distance: minDistance,
+      color: '#ffffff' // White background for relationship nodes (styling handled in renderer)
     };
   });
 
+  // Combine all nodes
+  const allNodes = [...conceptNodeVisuals, ...relationshipNodeVisuals];
+
+  // Create fanout edges: concept -> relationship -> concept
+  const fanoutEdges: UI.EdgeVisual[] = [];
+  
+  relationshipGroups.forEach((edges, relationship) => {
+    const relationshipNodeId = `rel:${relationship}`;
+    
+    edges.forEach(edge => {
+      // Edge from source concept to relationship
+      fanoutEdges.push({
+        id: `${edge.source.id}-to-${relationshipNodeId}`,
+        source: edge.source.id,
+        target: relationshipNodeId,
+        label: '',
+        edge,
+        highlighted: false,
+        color: '#999',
+        width: 1
+      });
+      
+      // Edge from relationship to target concept
+      fanoutEdges.push({
+        id: `${relationshipNodeId}-to-${edge.target.id}`,
+        source: relationshipNodeId,
+        target: edge.target.id,
+        label: '',
+        edge,
+        highlighted: false,
+        color: '#999',
+        width: 1
+      });
+    });
+  });
+
   return {
-    nodes: nodeVisuals,
-    links: edgeVisuals
+    nodes: allNodes,
+    links: fanoutEdges
   };
 }
 
@@ -71,12 +120,7 @@ function getNodeColor(isActive: boolean, isSelected: boolean, distance: number):
   }
 }
 
-/**
- * Get edge color based on state
- */
-function getEdgeColor(isHighlighted: boolean): string {
-  return isHighlighted ? '#ff6b6b' : '#999';
-}
+// getEdgeColor removed - no longer needed with articulated relationships
 
 /**
  * Select a random node from the concept map
