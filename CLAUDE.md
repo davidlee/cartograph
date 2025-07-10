@@ -90,6 +90,28 @@ This project uses a DIY Kanban system with folders and Markdown files.
 - **Imports**: Use absolute imports with `@/` prefix for src directory
 - **Fonts**: Use CSS variable references for consistent typography
 
+## Planned Functionality
+
+- provide a UI for exploring the currently active concept map as a force-directed, animated graph with spring weights, gravity & repulsive forces
+- interactive controls for navigation
+  - select a visible neighbour (on click), making it the active node
+  - change the filter distance of the active concept map (n, where only neighbours with <= n distant neighbours are shown), e.g. with a slider control
+  - shift-select a visible neighbouring node, highlighting it and adding its neighbours to those displayed.
+  - search (text substring match) for nodes / edges, and
+    - select a node to make it the active node
+    - select an edge to make it active (visualise all predicates with that relationship text)
+    - create a new predicate with the active node and the chosen node or relationship (e.g. by control-clicking)
+  - hover over a node to display its definition
+- general commands 
+  - edit the current concept map as plain text
+  - add a new predicate
+  - export the active concept map as plain text (DSL)
+  - import (replace active, append / merge, or create new) plain text DSL
+  - edit and validate the active concept map as a plain text DSL
+  - export / download the current view as an image (png)
+  - toggle sidebar with definitions for any nodes shown (if defined)
+  - list concept maps (in user's localstorage); select to change the active concept map
+
 ## Future Architecture Considerations
 
 - **State Management**: Consider context or state management library for complex concept map data
